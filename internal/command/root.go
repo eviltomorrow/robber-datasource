@@ -33,7 +33,7 @@ var rootCmd = &cobra.Command{
 					log.Fatalf("[Fatal] Get free port failure, nest error: %v\r\n", err)
 				}
 
-				log.Printf("[Debug] The debug mode is started, pprof service is listend on http://%s:%d/debug/pprof", system.IP, port)
+				log.Printf("[Debug] Debug mode is started, pprof service is listend on http://%s:%d/debug/pprof", system.IP, port)
 				if err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 					log.Fatalf("[Fatal] ListenAndServe pprof server failure, nest error: %v\r\n", err)
 				}
