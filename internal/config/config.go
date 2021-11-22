@@ -66,6 +66,11 @@ var GlobalConfig = &Config{
 	MongoDB: MongoDB{
 		DSN: "mongodb://localhost:27017",
 	},
+	Etcd: Etcd{
+		Endpoints: []string{
+			"localhost:2379",
+		},
+	},
 	Server: Server{
 		Host: "0.0.0.0",
 		Port: 19090,
