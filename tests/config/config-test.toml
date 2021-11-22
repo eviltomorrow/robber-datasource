@@ -1,0 +1,20 @@
+[log]
+disable-timestamp = true
+level = "test"
+format = "test"
+filename = "/tmp/robber-datasource/data.log"
+maxsize = 2
+
+[mongodb]
+dsn = "mongodb://127.0.0.1:27017"
+
+[server]
+host = "0.0.0.1"
+port = 29090
+
+[collect]
+code-list = [
+    "sh688***",
+	"sh605***",
+	"sh603***",
+]

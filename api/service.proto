@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "./;pb";
+package datasource_sina;
+
+service Service {
+    rpc Version(google.protobuf.Empty) returns (google.protobuf.StringValue){}
+
+    rpc Collect(google.protobuf.Empty) returns (google.protobuf.StringValue){}
+    rpc PullData(google.protobuf.StringValue) returns (stream Metadata){}
+}
+
+message Metadata {
+    string code = 1;
+    string name = 2;
+    double open = 3;
+    double yesterday_closed = 4;
+    double latest = 5;
+    double high = 6;
+    double low = 7;
+    uint64 volume = 8;
+    double account = 9;
+    string date = 10;
+    string time = 11;
+    string suspend = 12;
+}
