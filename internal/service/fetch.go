@@ -82,7 +82,12 @@ func parseDataToTrade(code, data string) (*model.Metadata, error) {
 		attr = attr[:len(attr)-1]
 	}
 	switch {
-	case strings.HasPrefix(code, "sh6"):
+	case strings.HasPrefix(code, "sh68"):
+		if len(attr) != 34 {
+			zlog.Warn("Invalid trade data", zap.String("code", code), zap.String("data", data), zap.Int("len", len(attr)))
+			return nil, ErrNoStockData
+		}
+	case strings.HasPrefix(code, "sh60"):
 		if len(attr) != 33 {
 			zlog.Warn("Invalid trade data", zap.String("code", code), zap.String("data", data), zap.Int("len", len(attr)))
 			return nil, ErrNoStockData

@@ -69,3 +69,56 @@ func TestVersion(t *testing.T) {
 	}
 	fmt.Println(repley.Value)
 }
+
+func TestCollect(t *testing.T) {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"localhost:2379"},
+		DialTimeout: 5 * time.Second,
+		LogConfig: &zap.Config{
+			Level:            zap.NewAtomicLevelAt(zap.ErrorLevel),
+			Development:      false,
+			Encoding:         "json",
+			EncoderConfig:    zap.NewProductionEncoderConfig(),
+			OutputPaths:      []string{"stderr"},
+			ErrorOutputPaths: []string{"stderr"},
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = cli.Status(ctx, "localhost:2379")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	builder := &grpclb.Builder{
+		Client: cli,
+	}
+	resolver.Register(builder)
+
+	target := fmt.Sprintf("etcd:///%s", server.Key)
+	conn, err := grpc.DialContext(
+		context.Background(),
+		target,
+		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, roundrobin.Name)),
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+	log.Println("connetion ...")
+
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	client := pb.NewServiceClient(conn)
+	repley, err := client.Collect(ctx, &emptypb.Empty{})
+	if err != nil {
+		log.Fatalf("Collect error: %v", err)
+	}
+	fmt.Println(repley.Value)
+}

@@ -1,15 +1,21 @@
 package command
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/eviltomorrow/robber-core/pkg/mongodb"
+	"github.com/eviltomorrow/robber-core/pkg/system"
 	"github.com/eviltomorrow/robber-core/pkg/zlog"
+	"github.com/eviltomorrow/robber-core/pkg/znet"
 	"github.com/eviltomorrow/robber-datasource/internal/config"
 	"github.com/eviltomorrow/robber-datasource/internal/server"
+
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -20,6 +26,20 @@ var rootCmd = &cobra.Command{
 	Short: "",
 	Long:  "  \r\nrobber-datasource server running",
 	Run: func(cmd *cobra.Command, args []string) {
+		if pprofMode {
+			go func() {
+				port, err := znet.GetFreePort()
+				if err != nil {
+					log.Fatalf("[Fatal] Get free port failure, nest error: %v\r\n", err)
+				}
+
+				log.Printf("[Debug] The debug mode is started, pprof service is listend on http://%s:%d/debug/pprof", system.IP, port)
+				if err = http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+					log.Fatalf("[Fatal] ListenAndServe pprof server failure, nest error: %v\r\n", err)
+				}
+			}()
+		}
+
 		setupCfg()
 		setupVars()
 		if err := mongodb.Build(); err != nil {
@@ -38,6 +58,7 @@ var (
 	cleanFuncs []func() error
 	cfg        = config.GlobalConfig
 	cfgPath    = ""
+	pprofMode  bool
 )
 
 func init() {
@@ -45,6 +66,7 @@ func init() {
 		DisableDefaultCmd: true,
 	}
 	rootCmd.Flags().StringVarP(&cfgPath, "config", "c", "config.toml", "robber-datasource's config file")
+	rootCmd.Flags().BoolVarP(&pprofMode, "pprof", "p", false, "robber-datasource's pprof mode")
 	rootCmd.MarkFlagRequired("config")
 }
 

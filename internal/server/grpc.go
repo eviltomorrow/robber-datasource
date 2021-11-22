@@ -64,7 +64,7 @@ func (g *GRPC) Collect(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.Strin
 		now  = time.Now()
 		date = now.Format("2006-01-02")
 	)
-	if _, ok := tasks.LoadOrStore(date, struct{}{}); ok {
+	if _, ok := tasks.Load(date); ok {
 		return &wrapperspb.StringValue{Value: date}, nil
 	}
 	if now.Hour() < 16 {
@@ -149,6 +149,7 @@ func (g *GRPC) Collect(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.Strin
 		zlog.Info("Finish sync metadata", zap.String("date", date), zap.Int64("count", count))
 	}()
 
+	tasks.Store(date, struct{}{})
 	return &wrapperspb.StringValue{Value: date}, nil
 }
 

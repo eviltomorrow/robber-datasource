@@ -89,9 +89,16 @@ func parseDataToTradeNolog(code, data string) (*model.Metadata, error) {
 	if len(attr) == 1 {
 		return nil, ErrNoStockCode
 	}
+	if len(attr) >= 2 && attr[len(attr)-1] == "" {
+		attr = attr[:len(attr)-1]
+	}
 	switch {
-	case strings.HasPrefix(code, "sh"):
+	case strings.HasPrefix(code, "sh68"):
 		if len(attr) != 34 {
+			return nil, ErrNoStockData
+		}
+	case strings.HasPrefix(code, "sh60"):
+		if len(attr) != 33 {
 			return nil, ErrNoStockData
 		}
 	case strings.HasPrefix(code, "sz0"):
