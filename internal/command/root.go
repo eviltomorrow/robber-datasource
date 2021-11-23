@@ -13,6 +13,7 @@ import (
 	"github.com/eviltomorrow/robber-core/pkg/znet"
 	"github.com/eviltomorrow/robber-datasource/internal/config"
 	"github.com/eviltomorrow/robber-datasource/internal/server"
+	"github.com/eviltomorrow/robber-datasource/pkg/client"
 
 	"net/http"
 	_ "net/http/pprof"
@@ -125,4 +126,5 @@ func setupVars() {
 
 	mongodb.DSN = cfg.MongoDB.DSN
 
+	client.EtcdEndpoints = cfg.Etcd.Endpoints
 }
