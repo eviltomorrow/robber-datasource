@@ -77,6 +77,7 @@ func (g *GRPC) Collect(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.Strin
 	go func() {
 		zlog.Info("Begin sync metadata", zap.String("date", date))
 		var (
+			now        = time.Now()
 			retrytimes = 0
 			count      int64
 			timeout    = 10 * time.Second
@@ -115,7 +116,7 @@ func (g *GRPC) Collect(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.Strin
 					zlog.Error("InsertMetadataMany failure", zap.Error(err))
 				}
 				count += affected
-				time.Sleep(time.Duration(zmath.GenRandInt(20, 50)) * time.Second)
+				time.Sleep(time.Duration(zmath.GenRandInt(10, 30)) * time.Second)
 			}
 		}
 
@@ -146,7 +147,7 @@ func (g *GRPC) Collect(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.Strin
 				count += affected
 			}
 		}
-		zlog.Info("Finish sync metadata", zap.String("date", date), zap.Int64("count", count))
+		zlog.Info("Finish sync metadata", zap.String("date", date), zap.Int64("count", count), zap.Duration("cost", time.Since(now)))
 	}()
 
 	tasks.Store(date, struct{}{})
