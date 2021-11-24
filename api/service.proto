@@ -4,7 +4,7 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/empty.proto";
 
 option go_package = "./;pb";
-package datasource_sina;
+package datasource;
 
 service Service {
     rpc Version(google.protobuf.Empty) returns (google.protobuf.StringValue){}

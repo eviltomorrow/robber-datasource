@@ -39,7 +39,7 @@ func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
 
 func (c *serviceClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/datasource_sina.Service/Version", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/datasource.Service/Version", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *serviceClient) Version(ctx context.Context, in *emptypb.Empty, opts ...
 
 func (c *serviceClient) Collect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/datasource_sina.Service/Collect", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/datasource.Service/Collect", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *serviceClient) Collect(ctx context.Context, in *emptypb.Empty, opts ...
 }
 
 func (c *serviceClient) PullData(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (Service_PullDataClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Service_ServiceDesc.Streams[0], "/datasource_sina.Service/PullData", opts...)
+	stream, err := c.cc.NewStream(ctx, &Service_ServiceDesc.Streams[0], "/datasource.Service/PullData", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func _Service_Version_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/datasource_sina.Service/Version",
+		FullMethod: "/datasource.Service/Version",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ServiceServer).Version(ctx, req.(*emptypb.Empty))
@@ -151,7 +151,7 @@ func _Service_Collect_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/datasource_sina.Service/Collect",
+		FullMethod: "/datasource.Service/Collect",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ServiceServer).Collect(ctx, req.(*emptypb.Empty))
@@ -184,7 +184,7 @@ func (x *servicePullDataServer) Send(m *Metadata) error {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Service_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "datasource_sina.Service",
+	ServiceName: "datasource.Service",
 	HandlerType: (*ServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
