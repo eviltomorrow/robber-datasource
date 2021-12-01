@@ -1,29 +1,27 @@
 #!/bin/bash
 
 os=$(uname -s)
-arch=$(uname -m)
-
 GOOS=""
-GOARCH=""
-
 case ${os} in
-    "Linux") 
+    "Linux" ) 
         GOOS="linux"
     ;;
-    "Darwin") 
+    "Darwin" ) 
         GOOS="darwin"
     ;;
-    *) 
+    * ) 
         echo -e "[\033[34mFatal\033[0m]: 暂不支持的系统类型[${os}] "
         exit 255
     ;;
 esac
 
+arch=$(uname -m)
+GOARCH=""
 case ${arch} in
-    "x86_64") 
+    "x86_64" ) 
         GOARCH="amd64"
     ;;
-    *) 
+    * ) 
         echo -e "[\033[34mFatal\033[0m]: 暂不支持的 cpu 架构[${arch}] "
         exit 255
     ;;
