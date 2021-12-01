@@ -1,5 +1,34 @@
 #!/bin/bash
 
+os=$(uname -s)
+arch=$(uname -m)
+
+GOOS=""
+GOARCH=""
+
+case ${os} in
+    "Linux") 
+        GOOS="linux"
+    ;;
+    "Darwin") 
+        GOOS="darwin"
+    ;;
+    *) 
+        echo -e "[\033[34mFatal\033[0m]: 暂不支持的系统类型[${os}] "
+        exit 255
+    ;;
+esac
+
+case ${arch} in
+    "x86_64") 
+        GOARCH="amd64"
+    ;;
+    *) 
+        echo -e "[\033[34mFatal\033[0m]: 暂不支持的 cpu 架构[${arch}] "
+        exit 255
+    ;;
+esac
+
 cur_dir=$(pwd)
 pb_dir=$(pwd)/pkg/pb
 mkdir -p ${pb_dir}
@@ -12,8 +41,7 @@ for file_name in $file_names
 do
     file_path=$proto_dir/$file_name
     if [ "${file_path##*.}x" == "proto"x ]; then
-        echo ${cur_dir}
-        ${cur_dir}/tools/protoc/bin/protoc --proto_path="" -I . --go_out=${pb_dir} --go-grpc_out=${pb_dir} $file_name
+        ${cur_dir}/tools/protoc/${GOOS}_${GOARCH}/bin/protoc --proto_path="" -I . --go_out=${pb_dir} --go-grpc_out=${pb_dir} $file_name
         
         code=$(echo $?)
         if [ $code = 0 ]; then
