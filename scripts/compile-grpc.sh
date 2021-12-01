@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cur_dir=$(pwd)
 pb_dir=$(pwd)/pkg/pb
 mkdir -p ${pb_dir}
 
@@ -11,7 +12,8 @@ for file_name in $file_names
 do
     file_path=$proto_dir/$file_name
     if [ "${file_path##*.}x" == "proto"x ]; then
-        protoc --proto_path="" -I . --go_out=${pb_dir} --go-grpc_out=${pb_dir} $file_name
+        echo ${cur_dir}
+        ${cur_dir}/tools/protoc/bin/protoc --proto_path="" -I . --go_out=${pb_dir} --go-grpc_out=${pb_dir} $file_name
         
         code=$(echo $?)
         if [ $code = 0 ]; then
