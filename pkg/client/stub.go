@@ -43,12 +43,9 @@ func NewClientForDatasource() (pb.ServiceClient, func(), error) {
 	}
 	resolver.Register(builder)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
 	target := fmt.Sprintf("etcd:///%s", server.Key)
 	conn, err := grpc.DialContext(
-		ctx,
+		context.Background(),
 		target,
 		grpc.WithDefaultServiceConfig(fmt.Sprintf(`{"LoadBalancingPolicy": "%s"}`, roundrobin.Name)),
 		grpc.WithInsecure(),

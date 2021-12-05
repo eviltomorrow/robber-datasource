@@ -78,7 +78,7 @@ compile:
 build: fmt
 	@echo "$(CGREEN)=> Building ...$(CEND)"
 	@mkdir -p bin
-	go build ${LDFLAGS} ${GCFLAGS} -o bin/${BINARY} ${GOFILE}
+	go build -race ${LDFLAGS} ${GCFLAGS} -o bin/${BINARY} ${GOFILE}
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 
 # Build docker
