@@ -26,20 +26,3 @@ func TestVersion(t *testing.T) {
 	}
 	fmt.Println(repley.Value)
 }
-
-func TestCollect(t *testing.T) {
-	stub, close, err := client.NewClientForDatasource()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer close()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	repley, err := stub.Collect(ctx, &emptypb.Empty{})
-	if err != nil {
-		log.Fatalf("Collect error: %v", err)
-	}
-	fmt.Println(repley.Value)
-}
