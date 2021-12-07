@@ -9,7 +9,6 @@ package datasource;
 service Service {
     rpc Version(google.protobuf.Empty) returns (google.protobuf.StringValue){}
 
-    rpc Collect(google.protobuf.Empty) returns (google.protobuf.StringValue){}
     rpc PullData(google.protobuf.StringValue) returns (stream Metadata){}
 }
 

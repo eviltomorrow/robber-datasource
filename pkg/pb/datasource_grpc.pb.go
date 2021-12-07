@@ -25,7 +25,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ServiceClient interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	Collect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	PullData(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (Service_PullDataClient, error)
 }
 
@@ -40,15 +39,6 @@ func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
 func (c *serviceClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
 	err := c.cc.Invoke(ctx, "/datasource.Service/Version", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *serviceClient) Collect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
-	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/datasource.Service/Collect", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +82,6 @@ func (x *servicePullDataClient) Recv() (*Metadata, error) {
 // for forward compatibility
 type ServiceServer interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
-	Collect(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
 	PullData(*wrapperspb.StringValue, Service_PullDataServer) error
 	mustEmbedUnimplementedServiceServer()
 }
@@ -103,9 +92,6 @@ type UnimplementedServiceServer struct {
 
 func (UnimplementedServiceServer) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
-}
-func (UnimplementedServiceServer) Collect(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Collect not implemented")
 }
 func (UnimplementedServiceServer) PullData(*wrapperspb.StringValue, Service_PullDataServer) error {
 	return status.Errorf(codes.Unimplemented, "method PullData not implemented")
@@ -141,24 +127,6 @@ func _Service_Version_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Service_Collect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ServiceServer).Collect(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/datasource.Service/Collect",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).Collect(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Service_PullData_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(wrapperspb.StringValue)
 	if err := stream.RecvMsg(m); err != nil {
@@ -190,10 +158,6 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Version",
 			Handler:    _Service_Version_Handler,
-		},
-		{
-			MethodName: "Collect",
-			Handler:    _Service_Collect_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

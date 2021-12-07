@@ -13,12 +13,18 @@ const (
 	date = "2021-04-21"
 )
 
-func init() {
+func initMongodb() error {
 	mongodb.DSN = "mongodb://localhost:27017"
-	mongodb.Build()
+	if err := mongodb.Build(); err != nil {
+		return err
+	}
+	return nil
 }
 func TestInsertMetadataMany(t *testing.T) {
 	_assert := assert.New(t)
+
+	err := initMongodb()
+	_assert.Nil(err)
 
 	var md = &model.Metadata{
 		Code:            "sz000001",
@@ -56,6 +62,9 @@ func TestInsertMetadataMany(t *testing.T) {
 func TestDeleteMetadataByDate(t *testing.T) {
 	_assert := assert.New(t)
 
+	err := initMongodb()
+	_assert.Nil(err)
+
 	affected, err := DeleteMetadataByDate(mongodb.DB, "", "2030-04-05", 10*time.Second)
 	_assert.Nil(err)
 	_assert.Equal(int64(0), affected)
@@ -85,6 +94,11 @@ func TestDeleteMetadataByDate(t *testing.T) {
 }
 
 func BenchmarkInsertMetadataMany(b *testing.B) {
+	err := initMongodb()
+	if err != nil {
+		b.Fatal(err)
+	}
+
 	var md = &model.Metadata{
 		Code:            "sz000001",
 		Name:            "平安银行",

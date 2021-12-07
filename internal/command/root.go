@@ -13,6 +13,7 @@ import (
 	"github.com/eviltomorrow/robber-core/pkg/znet"
 	"github.com/eviltomorrow/robber-datasource/internal/config"
 	"github.com/eviltomorrow/robber-datasource/internal/server"
+	"github.com/eviltomorrow/robber-datasource/internal/service"
 	"github.com/eviltomorrow/robber-datasource/pkg/client"
 
 	"net/http"
@@ -47,6 +48,7 @@ var rootCmd = &cobra.Command{
 			zlog.Fatal("Build mongodb connection failure", zap.Error(err))
 		}
 
+		go service.RunSchedulerBackground()
 		if err := server.StartupGRPC(); err != nil {
 			zlog.Fatal("Startup GRPC service failure", zap.Error(err))
 		}

@@ -5,14 +5,12 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"sync"
 	"time"
 
 	"github.com/eviltomorrow/robber-core/pkg/grpclb"
 	"github.com/eviltomorrow/robber-core/pkg/mongodb"
 	"github.com/eviltomorrow/robber-core/pkg/system"
 	"github.com/eviltomorrow/robber-core/pkg/zlog"
-	"github.com/eviltomorrow/robber-core/pkg/zmath"
 	"github.com/eviltomorrow/robber-core/pkg/znet"
 	"github.com/eviltomorrow/robber-datasource/internal/middleware"
 	"github.com/eviltomorrow/robber-datasource/internal/service"
@@ -32,7 +30,6 @@ var (
 	Key            = "grpclb/service/database"
 
 	server *grpc.Server
-	tasks  sync.Map
 )
 
 type GRPC struct {
@@ -40,7 +37,6 @@ type GRPC struct {
 }
 
 // Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
-// Collect(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
 // PullData(*wrapperspb.StringValue, Service_PullDataServer) error
 
 func (g *GRPC) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.StringValue, error) {
@@ -57,101 +53,6 @@ func (g *GRPC) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.Strin
 	buf.WriteString(fmt.Sprintf("   IP: %v\r\n", system.IP))
 	buf.WriteString(fmt.Sprintf("   Running Time: %v\r\n", system.RunningTime()))
 	return &wrapperspb.StringValue{Value: buf.String()}, nil
-}
-
-func (g *GRPC) Collect(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.StringValue, error) {
-	var (
-		now  = time.Now()
-		date = now.Format("2006-01-02")
-	)
-	if _, ok := tasks.Load(date); ok {
-		return &wrapperspb.StringValue{Value: date}, nil
-	}
-	if now.Hour() < 16 {
-		return nil, fmt.Errorf("collect data should be after 16:00")
-	}
-	if now.Weekday() == time.Saturday || now.Weekday() == time.Sunday {
-		return nil, fmt.Errorf("collect data should be workday")
-	}
-
-	go func() {
-		zlog.Info("Begin sync metadata", zap.String("date", date))
-		var (
-			now        = time.Now()
-			retrytimes = 0
-			count      int64
-			timeout    = 10 * time.Second
-			size       = 30
-			codes      = make([]string, 0, size)
-		)
-		for code := range service.BuildRangeCode() {
-			codes = append(codes, code)
-			if len(codes) == size {
-			retry_1:
-				metadata, err := service.FetchMetadataFromSina(codes)
-				if err != nil {
-					retrytimes++
-					if retrytimes == 10 {
-						zlog.Error("FetchMetadataFromSina failure", zap.Strings("codes", codes), zap.Error(err))
-					} else {
-						time.Sleep(30 * time.Second)
-						goto retry_1
-					}
-				}
-				retrytimes = 0
-				codes = codes[:0]
-
-				if len(metadata) == 0 {
-					continue
-				}
-
-				for _, md := range metadata {
-					_, err := service.DeleteMetadataByDate(mongodb.DB, md.Code, md.Date, timeout)
-					if err != nil {
-						zlog.Error("DeleteMetadataByDate failure", zap.Strings("codes", codes), zap.Error(err))
-					}
-				}
-				affected, err := service.InsertMetadataMany(mongodb.DB, metadata, timeout)
-				if err != nil {
-					zlog.Error("InsertMetadataMany failure", zap.Error(err))
-				}
-				count += affected
-				time.Sleep(time.Duration(zmath.GenRandInt(10, 30)) * time.Second)
-			}
-		}
-
-		if len(codes) != 0 {
-		retry_2:
-			metadata, err := service.FetchMetadataFromSina(codes)
-			if err != nil {
-				retrytimes++
-				if retrytimes == 10 {
-					zlog.Error("FetchMetadataFromSina failure", zap.Strings("codes", codes), zap.Error(err))
-				} else {
-					time.Sleep(30 * time.Second)
-					goto retry_2
-				}
-			}
-
-			if len(metadata) != 0 {
-				for _, md := range metadata {
-					_, err := service.DeleteMetadataByDate(mongodb.DB, md.Code, md.Date, timeout)
-					if err != nil {
-						zlog.Error("DeleteMetadataByDate failure", zap.Strings("codes", codes), zap.Error(err))
-					}
-				}
-				affected, err := service.InsertMetadataMany(mongodb.DB, metadata, timeout)
-				if err != nil {
-					zlog.Error("InsertMetadataMany failure", zap.Error(err))
-				}
-				count += affected
-			}
-		}
-		zlog.Info("Finish sync metadata", zap.String("date", date), zap.Int64("count", count), zap.Duration("cost", time.Since(now)))
-	}()
-
-	tasks.Store(date, struct{}{})
-	return &wrapperspb.StringValue{Value: date}, nil
 }
 
 func (g *GRPC) PullData(req *wrapperspb.StringValue, resp pb.Service_PullDataServer) error {
