@@ -20,14 +20,14 @@ func UnaryServerLogInterceptor(ctx context.Context, req interface{}, info *grpc.
 
 	var start = time.Now()
 	defer func() {
-		zlog.Info("grpc(*unary)",
+		zlog.Info("",
+			zap.String("addr", addr),
+			zap.Duration("cost", time.Since(start)),
 			zap.String("service", path.Dir(info.FullMethod)[1:]),
 			zap.String("method", path.Base(info.FullMethod)),
-			zap.String("addr", addr),
 			zap.Any("req", req),
 			zap.Any("resp", resp),
 			zap.Error(err),
-			zap.Duration("cost", time.Since(start)),
 		)
 	}()
 
@@ -43,13 +43,13 @@ func StreamServerLogInterceptor(srv interface{}, stream grpc.ServerStream, info 
 	}
 	var start = time.Now()
 	defer func() {
-		zlog.Info("grpc(*stream)",
+		zlog.Info("",
+			zap.String("addr", addr),
+			zap.Duration("cost", time.Since(start)),
 			zap.String("service", path.Dir(info.FullMethod)[1:]),
 			zap.String("method", path.Base(info.FullMethod)),
-			zap.String("addr", addr),
 			zap.Any("srv", srv),
 			zap.Error(err),
-			zap.Duration("cost", time.Since(start)),
 		)
 	}()
 
