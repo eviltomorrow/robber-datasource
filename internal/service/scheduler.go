@@ -23,7 +23,7 @@ func RunScheduler() {
 			now = time.Now()
 		)
 
-		zlog.Info("Fetch metadata begin: ", zap.String("date", now.Format("2006-01-02")))
+		zlog.Info("Fetch metadata begin", zap.String("date", now.Format("2006-01-02")))
 		date, fetchCount, err := FetchMetadataFromSina(now, true)
 		if err != nil {
 			zlog.Error("Cron: FetchMetadataFromSina failure", zap.Error(err))
