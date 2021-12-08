@@ -48,7 +48,7 @@ var rootCmd = &cobra.Command{
 			zlog.Fatal("Build mongodb connection failure", zap.Error(err))
 		}
 
-		go service.RunSchedulerBackground()
+		go service.RunScheduler()
 		if err := server.StartupGRPC(); err != nil {
 			zlog.Fatal("Startup GRPC service failure", zap.Error(err))
 		}

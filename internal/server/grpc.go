@@ -36,9 +36,6 @@ type GRPC struct {
 	pb.UnimplementedServiceServer
 }
 
-// Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
-// PullData(*wrapperspb.StringValue, Service_PullDataServer) error
-
 func (g *GRPC) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	var buf bytes.Buffer
 	buf.WriteString("Server: \r\n")

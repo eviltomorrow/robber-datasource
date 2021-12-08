@@ -9,8 +9,7 @@ import (
 	"github.com/eviltomorrow/robber-datasource/internal/model"
 )
 
-// FetchMetadataFromSina fetch data from sina
-func FetchMetadataFromLog(path string) (chan *model.Metadata, error) {
+func CollectMetadataFromLog(path string) (chan *model.Metadata, error) {
 	file, err := os.OpenFile(path, os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, err

@@ -2,8 +2,8 @@ package service
 
 import "testing"
 
-func TestFetchMetadataFromLog(t *testing.T) {
-	data, err := FetchMetadataFromLog("../../tests/log/data.log")
+func TestCollectMetadataFromLog(t *testing.T) {
+	data, err := CollectMetadataFromLog("../../tests/log/data.log")
 	if err != nil {
 		t.Fatal(err)
 	}

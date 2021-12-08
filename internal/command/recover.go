@@ -22,9 +22,9 @@ var recoverCmd = &cobra.Command{
 		if logPath == "" {
 			log.Fatalf("[Fatal] invalid data log file, logPath: [%s]", logPath)
 		}
-		data, err := service.FetchMetadataFromLog(logPath)
+		data, err := service.CollectMetadataFromLog(logPath)
 		if err != nil {
-			log.Fatalf("[Fatal] FetchMetadataFromLog failure, nest error: %v\r\n", err)
+			log.Fatalf("[Fatal] CollectMetadataFromLog failure, nest error: %v\r\n", err)
 		}
 
 		var (

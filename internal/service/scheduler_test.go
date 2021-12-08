@@ -1,18 +1,30 @@
 package service
 
 import (
+	"log"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_fetchMetadataFromSina(t *testing.T) {
+func TestOneCron(t *testing.T) {
 	_assert := assert.New(t)
 	err := initMongodb()
 	_assert.Nil(err)
 
-	date, err := fetchMetadataFromSina(false)
-	_assert.Nil(err)
-	_assert.Equal(time.Now().Format("2006-01-02"), date)
+	var (
+		now = time.Now()
+	)
+
+	date, fetchCount, err := FetchMetadataFromSina(now, false)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pushCount, err := PushMetadataToRepository(date)
+	if err != nil {
+		log.Fatal(err)
+	}
+	t.Logf("fetch: %d, push: %d\r\n", fetchCount, pushCount)
 }

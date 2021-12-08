@@ -17,8 +17,7 @@ var (
 	ErrNoStockData = fmt.Errorf("no stock data")
 )
 
-// FetchMetadataFromSina fetch data from sina
-func FetchMetadataFromSina(codes []string) ([]*model.Metadata, error) {
+func CollectMetadataFromSina(codes []string) ([]*model.Metadata, error) {
 	data, err := httpclient.GetHTTP(fmt.Sprintf("http://hq.sinajs.cn/list=%s", strings.Join(codes, ",")), 20*time.Second, httpclient.DefaultHeader)
 	if err != nil {
 		return nil, err
