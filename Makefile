@@ -86,8 +86,14 @@ build: fmt
 # Build docker
 docker:
 	@echo "$(CGREEN)=> Building for docker ...$(CEND)"
-	docker build -t robber:$(version) .
+	docker build -t registry.cn-hangzhou.aliyuncs.com/eviltomorrow/robber-datasource:$(version) .
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
+
+# Publish docker
+publish:
+	@echo "$(CGREEN)=> Publishing for docker ...$(CEND)"
+	docker push registry.cn-hangzhou.aliyuncs.com/eviltomorrow/robber-datasource:$(version)
+	@echo "$(CGREEN)=> Publish Success!$(CEND)"
 
 # Installs our project: copies binaries
 install: build

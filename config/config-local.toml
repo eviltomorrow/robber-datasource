@@ -1,0 +1,32 @@
+[log]
+disable-timestamp = false
+level = "info"
+format = "text"
+filename = "/var/log/robber-datasource/data.log"
+maxsize = 20
+
+[mongodb]
+dsn = "mongodb://localhost:27017"
+
+[etcd]
+endpoints = [
+	"localhost:2379",
+]
+
+[server]
+host = "0.0.0.0"
+port = 19090
+
+[collect]
+code-list = [
+    "sh688***",
+	"sh605***",
+	"sh603***",
+	"sh601***",
+	"sh600***",
+	"sz300***",
+	"sz0030**",
+	"sz002***",
+	"sz001**",
+	"sz000***",
+]
