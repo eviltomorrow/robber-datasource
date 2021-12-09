@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/eviltomorrow/robber-core/pkg/mongodb"
 	"github.com/eviltomorrow/robber-datasource/internal/service"
 	"github.com/spf13/cobra"
 )
@@ -13,6 +14,9 @@ var archiveCmd = &cobra.Command{
 	Short: "Archive data with specify date to repository",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		var (
+			now = time.Now()
+		)
 		if beginDate == "" || endDate == "" {
 			log.Fatalf("invalid begin/end date param\r\n")
 		}
@@ -26,15 +30,24 @@ var archiveCmd = &cobra.Command{
 		}
 		end = end.Add(1 * time.Second)
 
+		setupCfg()
+		setupVars()
+		if err := mongodb.Build(); err != nil {
+			log.Fatalf("Build mongodb connection failure, nest error: %v\r\n", err)
+		}
+
+		var total int64 = 0
 		for begin.Before(end) {
 			count, err := service.PushMetadataToRepository(begin.Format("2006-01-02"))
 			if err != nil {
-				log.Fatalf("[PushMetadataToRepository failure], nest error: %v, date: %v\r\n", err, begin.Format("2006-01-02"))
+				log.Fatalf("[failure] date: %v, error: %v\r\n", begin.Format("2006-01-02"), err)
 			} else {
-				log.Printf("[PushMetadataToRepository success], date: %v, count: %v\r\n", begin.Format("2006-01-02"), count)
+				log.Printf("[success] date: %v, count: %v\r\n", begin.Format("2006-01-02"), count)
 			}
 			begin = begin.AddDate(0, 0, 1)
+			total += count
 		}
+		log.Printf("[complete] total count: %v, cost: %v\r\n", total, time.Since(now))
 	},
 }
 
@@ -47,6 +60,8 @@ func init() {
 	archiveCmd.Flags().StringVar(&endDate, "end", "", "archive end param")
 	archiveCmd.MarkFlagRequired("begin")
 	archiveCmd.MarkFlagRequired("end")
+	archiveCmd.Flags().StringVarP(&cfgPath, "config", "c", "config.toml", "robber-datasource's config file")
+	archiveCmd.MarkFlagRequired("config")
 
 	rootCmd.AddCommand(archiveCmd)
 }
