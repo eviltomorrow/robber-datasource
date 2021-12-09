@@ -10,7 +10,7 @@ import (
 	"github.com/eviltomorrow/robber-core/pkg/zmath"
 	client_repository "github.com/eviltomorrow/robber-repository/pkg/client"
 	pb_repository "github.com/eviltomorrow/robber-repository/pkg/pb"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 )
 

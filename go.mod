@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.4.1
 	github.com/eviltomorrow/robber-core v0.0.0-20211126000409-1ebf17a6cae6
 	github.com/eviltomorrow/robber-repository v0.0.0-20211208102517-93046df770b9
-	github.com/robfig/cron v1.2.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
 	go.etcd.io/etcd/client/v3 v3.5.1

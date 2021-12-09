@@ -1,5 +1,7 @@
 # This how we want to name the binary output
 #
+version=v3.0
+#
 BINARY=robber-datasource
 GOFILE=cmd/robber-datasource.go
 GOPATH ?= $(shell go env GOPATH)
@@ -27,7 +29,7 @@ CEND:=$(shell tput sgr0 2>/dev/null)
 all: | fmt build
 
 .PHONY: go_version_check
-GO_VERSION_MIN=1.12
+GO_VERSION_MIN=1.15
 # Parse out the x.y or x.y.z version and output a single value x*10000+y*100+z (e.g., 1.9 is 10900)
 # that allows the three components to be checked in a single comparison.
 VER_TO_INT:=awk '{split(substr($$0, match ($$0, /[0-9\.]+/)), a, "."); print a[1]*10000+a[2]*100+a[3]}'
@@ -84,7 +86,6 @@ build: fmt
 # Build docker
 docker:
 	@echo "$(CGREEN)=> Building for docker ...$(CEND)"
-	@mkdir -p bin
 	docker build -t robber:$(version) .
 	@echo "$(CGREEN)=> Build Success!$(CEND)"
 
