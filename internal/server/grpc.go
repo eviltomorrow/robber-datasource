@@ -106,6 +106,11 @@ func StartupGRPC() error {
 	server = grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			middleware.UnaryServerRecoveryInterceptor,
+			middleware.UnaryServerLogInterceptor,
+		),
+		grpc.ChainStreamInterceptor(
+			middleware.StreamServerRecoveryInterceptor,
+			middleware.StreamServerLogInterceptor,
 		),
 	)
 
