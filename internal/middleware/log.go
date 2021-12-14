@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/eviltomorrow/robber-core/pkg/zlog"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/peer"
@@ -25,8 +26,8 @@ func UnaryServerLogInterceptor(ctx context.Context, req interface{}, info *grpc.
 			zap.Duration("cost", time.Since(start)),
 			zap.String("service", path.Dir(info.FullMethod)[1:]),
 			zap.String("method", path.Base(info.FullMethod)),
-			zap.Any("req", req),
-			zap.Any("resp", resp),
+			zap.String("req", jsonFormat(req)),
+			zap.String("resp", jsonFormat(resp)),
 			zap.Error(err),
 		)
 	}()
@@ -48,10 +49,28 @@ func StreamServerLogInterceptor(srv interface{}, stream grpc.ServerStream, info 
 			zap.Duration("cost", time.Since(start)),
 			zap.String("service", path.Dir(info.FullMethod)[1:]),
 			zap.String("method", path.Base(info.FullMethod)),
-			zap.Any("srv", srv),
+			zap.String("srv", jsonFormat(srv)),
 			zap.Error(err),
 		)
 	}()
 
 	return handler(srv, stream)
+}
+
+func jsonFormat(data interface{}) string {
+	buf, err := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(data)
+	if err == nil {
+		return string(buf)
+	}
+
+	if a, ok := data.(StringAble); ok {
+		return a.String()
+	}
+
+	return ""
+}
+
+// StringAble string
+type StringAble interface {
+	String() string
 }
