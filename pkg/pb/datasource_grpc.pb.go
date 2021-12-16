@@ -20,37 +20,37 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ServiceClient is the client API for Service service.
+// DatasourceClient is the client API for Datasource service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ServiceClient interface {
+type DatasourceClient interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	PullData(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (Service_PullDataClient, error)
+	PullData(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (Datasource_PullDataClient, error)
 }
 
-type serviceClient struct {
+type datasourceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
-	return &serviceClient{cc}
+func NewDatasourceClient(cc grpc.ClientConnInterface) DatasourceClient {
+	return &datasourceClient{cc}
 }
 
-func (c *serviceClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
+func (c *datasourceClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
-	err := c.cc.Invoke(ctx, "/datasource.Service/Version", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/datasource.Datasource/Version", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *serviceClient) PullData(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (Service_PullDataClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Service_ServiceDesc.Streams[0], "/datasource.Service/PullData", opts...)
+func (c *datasourceClient) PullData(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (Datasource_PullDataClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Datasource_ServiceDesc.Streams[0], "/datasource.Datasource/PullData", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &servicePullDataClient{stream}
+	x := &datasourcePullDataClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -60,16 +60,16 @@ func (c *serviceClient) PullData(ctx context.Context, in *wrapperspb.StringValue
 	return x, nil
 }
 
-type Service_PullDataClient interface {
+type Datasource_PullDataClient interface {
 	Recv() (*Metadata, error)
 	grpc.ClientStream
 }
 
-type servicePullDataClient struct {
+type datasourcePullDataClient struct {
 	grpc.ClientStream
 }
 
-func (x *servicePullDataClient) Recv() (*Metadata, error) {
+func (x *datasourcePullDataClient) Recv() (*Metadata, error) {
 	m := new(Metadata)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -77,93 +77,93 @@ func (x *servicePullDataClient) Recv() (*Metadata, error) {
 	return m, nil
 }
 
-// ServiceServer is the server API for Service service.
-// All implementations must embed UnimplementedServiceServer
+// DatasourceServer is the server API for Datasource service.
+// All implementations must embed UnimplementedDatasourceServer
 // for forward compatibility
-type ServiceServer interface {
+type DatasourceServer interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
-	PullData(*wrapperspb.StringValue, Service_PullDataServer) error
-	mustEmbedUnimplementedServiceServer()
+	PullData(*wrapperspb.StringValue, Datasource_PullDataServer) error
+	mustEmbedUnimplementedDatasourceServer()
 }
 
-// UnimplementedServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedServiceServer struct {
+// UnimplementedDatasourceServer must be embedded to have forward compatible implementations.
+type UnimplementedDatasourceServer struct {
 }
 
-func (UnimplementedServiceServer) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
+func (UnimplementedDatasourceServer) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
-func (UnimplementedServiceServer) PullData(*wrapperspb.StringValue, Service_PullDataServer) error {
+func (UnimplementedDatasourceServer) PullData(*wrapperspb.StringValue, Datasource_PullDataServer) error {
 	return status.Errorf(codes.Unimplemented, "method PullData not implemented")
 }
-func (UnimplementedServiceServer) mustEmbedUnimplementedServiceServer() {}
+func (UnimplementedDatasourceServer) mustEmbedUnimplementedDatasourceServer() {}
 
-// UnsafeServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ServiceServer will
+// UnsafeDatasourceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to DatasourceServer will
 // result in compilation errors.
-type UnsafeServiceServer interface {
-	mustEmbedUnimplementedServiceServer()
+type UnsafeDatasourceServer interface {
+	mustEmbedUnimplementedDatasourceServer()
 }
 
-func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
-	s.RegisterService(&Service_ServiceDesc, srv)
+func RegisterDatasourceServer(s grpc.ServiceRegistrar, srv DatasourceServer) {
+	s.RegisterService(&Datasource_ServiceDesc, srv)
 }
 
-func _Service_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Datasource_Version_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServiceServer).Version(ctx, in)
+		return srv.(DatasourceServer).Version(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/datasource.Service/Version",
+		FullMethod: "/datasource.Datasource/Version",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).Version(ctx, req.(*emptypb.Empty))
+		return srv.(DatasourceServer).Version(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Service_PullData_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _Datasource_PullData_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(wrapperspb.StringValue)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(ServiceServer).PullData(m, &servicePullDataServer{stream})
+	return srv.(DatasourceServer).PullData(m, &datasourcePullDataServer{stream})
 }
 
-type Service_PullDataServer interface {
+type Datasource_PullDataServer interface {
 	Send(*Metadata) error
 	grpc.ServerStream
 }
 
-type servicePullDataServer struct {
+type datasourcePullDataServer struct {
 	grpc.ServerStream
 }
 
-func (x *servicePullDataServer) Send(m *Metadata) error {
+func (x *datasourcePullDataServer) Send(m *Metadata) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-// Service_ServiceDesc is the grpc.ServiceDesc for Service service.
+// Datasource_ServiceDesc is the grpc.ServiceDesc for Datasource service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Service_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "datasource.Service",
-	HandlerType: (*ServiceServer)(nil),
+var Datasource_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "datasource.Datasource",
+	HandlerType: (*DatasourceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Version",
-			Handler:    _Service_Version_Handler,
+			Handler:    _Datasource_Version_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "PullData",
-			Handler:       _Service_PullData_Handler,
+			Handler:       _Datasource_PullData_Handler,
 			ServerStreams: true,
 		},
 	},

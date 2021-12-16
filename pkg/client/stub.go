@@ -17,11 +17,11 @@ import (
 
 var (
 	EtcdEndpoints = []string{
-		"localhost:2379",
+		"127.0.0.1:2379",
 	}
 )
 
-func NewClientForDatasource() (pb.ServiceClient, func(), error) {
+func NewClientForDatasource() (pb.DatasourceClient, func(), error) {
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints:   EtcdEndpoints,
 		DialTimeout: 5 * time.Second,
@@ -53,5 +53,5 @@ func NewClientForDatasource() (pb.ServiceClient, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	return pb.NewServiceClient(conn), func() { conn.Close() }, nil
+	return pb.NewDatasourceClient(conn), func() { conn.Close() }, nil
 }

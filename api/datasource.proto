@@ -6,7 +6,7 @@ import "google/protobuf/empty.proto";
 option go_package = "./;pb";
 package datasource;
 
-service Service {
+service Datasource {
     rpc Version(google.protobuf.Empty) returns (google.protobuf.StringValue){}
 
     rpc PullData(google.protobuf.StringValue) returns (stream Metadata){}

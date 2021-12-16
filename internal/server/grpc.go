@@ -33,7 +33,7 @@ var (
 )
 
 type GRPC struct {
-	pb.UnimplementedServiceServer
+	pb.UnimplementedDatasourceServer
 }
 
 func (g *GRPC) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.StringValue, error) {
@@ -52,7 +52,10 @@ func (g *GRPC) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.Strin
 	return &wrapperspb.StringValue{Value: buf.String()}, nil
 }
 
-func (g *GRPC) PullData(req *wrapperspb.StringValue, resp pb.Service_PullDataServer) error {
+// Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
+// 	PullData(*wrapperspb.StringValue, Datasource_PullDataServer) error
+
+func (g *GRPC) PullData(req *wrapperspb.StringValue, resp pb.Datasource_PullDataServer) error {
 	var (
 		offset  int64 = 0
 		limit   int64 = 100
@@ -115,7 +118,7 @@ func StartupGRPC() error {
 	)
 
 	reflection.Register(server)
-	pb.RegisterServiceServer(server, &GRPC{})
+	pb.RegisterDatasourceServer(server, &GRPC{})
 
 	localIp, err := znet.GetLocalIP2()
 	if err != nil {

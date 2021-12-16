@@ -64,11 +64,11 @@ var GlobalConfig = &Config{
 		MaxSize:          20,
 	},
 	MongoDB: MongoDB{
-		DSN: "mongodb://localhost:27017",
+		DSN: "mongodb://127.0.0.1:27017",
 	},
 	Etcd: Etcd{
 		Endpoints: []string{
-			"localhost:2379",
+			"127.0.0.1:2379",
 		},
 	},
 	Server: Server{

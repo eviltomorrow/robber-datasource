@@ -2,15 +2,15 @@
 disable-timestamp = false
 level = "info"
 format = "text"
-filename = "/var/log/robber-datasource/data.log"
+filename = "/tmp/robber-datasource/data.log"
 maxsize = 20
 
 [mongodb]
-dsn = "mongodb://172.17.0.1:27017"
+dsn = "mongodb://127.0.0.1:27017"
 
 [etcd]
 endpoints = [
-	"172.17.0.1:2379",
+	"127.0.0.1:2379",
 ]
 
 [server]

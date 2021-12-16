@@ -14,7 +14,7 @@ const (
 )
 
 func initMongodb() error {
-	mongodb.DSN = "mongodb://localhost:27017"
+	mongodb.DSN = "mongodb://127.0.0.1:27017"
 	if err := mongodb.Build(); err != nil {
 		return err
 	}
