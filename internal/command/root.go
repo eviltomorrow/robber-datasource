@@ -5,9 +5,11 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/eviltomorrow/robber-core/pkg/mongodb"
+	"github.com/eviltomorrow/robber-core/pkg/pid"
 	"github.com/eviltomorrow/robber-core/pkg/system"
 	"github.com/eviltomorrow/robber-core/pkg/zlog"
 	"github.com/eviltomorrow/robber-core/pkg/znet"
@@ -28,6 +30,10 @@ var rootCmd = &cobra.Command{
 	Short: "",
 	Long:  "  \r\nrobber-datasource server running",
 	Run: func(cmd *cobra.Command, args []string) {
+		if err := pid.CreatePidFile("robber-datasource.pid"); err != nil {
+			log.Fatalf("[Fatal] Robber-datasource create pid file failure, nest error: %v\r\n", err)
+		}
+
 		if pprofMode {
 			go func() {
 				port, err := znet.GetFreePort()
@@ -70,7 +76,6 @@ func init() {
 	}
 	rootCmd.Flags().StringVarP(&cfgPath, "config", "c", "config.toml", "robber-datasource's config file")
 	rootCmd.Flags().BoolVarP(&pprofMode, "pprof", "p", false, "robber-datasource's pprof mode")
-	rootCmd.MarkFlagRequired("config")
 }
 
 func Execute() {
@@ -95,10 +100,38 @@ func blockingUntilTermination() {
 func registerCleanFuncs() {
 	cleanFuncs = append(cleanFuncs, server.RevokeEtcdConn)
 	cleanFuncs = append(cleanFuncs, server.ShutdownGRPC)
+	cleanFuncs = append(cleanFuncs, pid.DestroyFile)
+}
+
+func findCfg() (string, error) {
+	var possibleConf = []string{
+		cfgPath,
+		"./etc/config.toml",
+		"../etc/config.toml",
+		"/etc/config.toml",
+	}
+	for _, path := range possibleConf {
+		if path == "" {
+			continue
+		}
+		if _, err := os.Stat(path); err == nil {
+			fp, err := filepath.Abs(path)
+			if err == nil {
+				return fp, nil
+			}
+			return path, nil
+		}
+	}
+	return "", fmt.Errorf("not find config.toml, possible path: %v", possibleConf)
 }
 
 func setupCfg() {
-	if err := cfg.Load(cfgPath, nil); err != nil {
+	path, err := findCfg()
+	if err != nil {
+		log.Fatalf("[Fatal] Find config file failure, nest error: %v\r\n", err)
+	}
+
+	if err := cfg.Load(path, nil); err != nil {
 		log.Fatalf("[Fatal] Load config file failure, nest error: %v\r\n", err)
 	}
 

@@ -100,3 +100,17 @@ install: build
 	@echo "$(CGREEN)=> Install ...$(CEND)"
 	go install ./...
 	@echo "$(CGREEN)=> install Success!$(CEND)"
+
+# Package tar.gz
+package: build
+	@echo "$(CGREEN)=> Package ...$(CEND)"
+	@mkdir -p package
+	@rm -rf package/*
+	@mkdir -p package/bin
+	@mkdir -p package/etc
+	@mkdir -p package/log
+	@cp bin/robber-datasource package/bin/
+	@cp scripts/startup.sh package/bin/
+	@cp config/config.toml package/etc/
+	@echo "exec-path: package/bin/robber-datasource"
+	@echo "$(CGREEN)=> Package Success!$(CEND)"

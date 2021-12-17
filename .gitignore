@@ -16,3 +16,6 @@
 
 /bin/robber-datasource
 vendor
+package
+log
+robber-datasource.pid

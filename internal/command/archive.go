@@ -61,7 +61,6 @@ func init() {
 	archiveCmd.MarkFlagRequired("begin")
 	archiveCmd.MarkFlagRequired("end")
 	archiveCmd.Flags().StringVarP(&cfgPath, "config", "c", "config.toml", "robber-datasource's config file")
-	archiveCmd.MarkFlagRequired("config")
 
 	rootCmd.AddCommand(archiveCmd)
 }

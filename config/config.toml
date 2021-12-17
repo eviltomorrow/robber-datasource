@@ -2,7 +2,7 @@
 disable-timestamp = false
 level = "info"
 format = "text"
-filename = "/tmp/robber-datasource/data.log"
+filename = "../log/data.log"
 maxsize = 20
 
 [mongodb]

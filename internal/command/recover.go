@@ -84,6 +84,6 @@ func init() {
 	recoverCmd.MarkFlagRequired("log")
 
 	recoverCmd.Flags().StringVarP(&cfgPath, "config", "c", "config.toml", "robber-datasource's config file")
-	recoverCmd.MarkFlagRequired("config")
+
 	rootCmd.AddCommand(recoverCmd)
 }
