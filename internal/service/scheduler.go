@@ -27,14 +27,20 @@ func RunScheduler() {
 		date, fetchCount, err := FetchMetadataFromSina(now, true)
 		if err != nil {
 			zlog.Error("Cron: FetchMetadataFromSina failure", zap.Error(err))
+			return
 		}
 
-		pushCount, err := PushMetadataToRepository(date)
+		metadata, stock, day, week, err := PushMetadataToRepository(date)
 		if err != nil {
 			zlog.Error("Cron: PushMetadataToRepository failure", zap.Error(err))
+			return
 		}
 
-		zlog.Info("Fetch metadata complete", zap.String("date", date), zap.Int64("fetch-count", fetchCount), zap.Int64("push-count", pushCount), zap.Duration("cost", time.Since(now)))
+		if err := CompleteTaskToRepository(date, metadata, stock, day, week); err != nil {
+			zlog.Error("Cron: CompleteTaskToRepository failure", zap.Error(err))
+		}
+		zlog.Info("Fetch metadata complete", zap.String("date", date), zap.Int64("fetch-count", fetchCount), zap.Int64("push-count", metadata), zap.Duration("cost", time.Since(now)))
+
 	})
 	if err != nil {
 		zlog.Fatal("Cron add func failure", zap.Error(err))
@@ -42,7 +48,7 @@ func RunScheduler() {
 	c.Start()
 }
 
-func PushMetadataToRepository(date string) (int64, error) {
+func PushMetadataToRepository(date string) (int64, int64, int64, int64, error) {
 	var (
 		offset  int64 = 0
 		limit   int64 = 100
@@ -53,19 +59,19 @@ func PushMetadataToRepository(date string) (int64, error) {
 
 	rstub, cancel, err := client_repository.NewClientForRepository()
 	if err != nil {
-		return count, err
+		return 0, 0, 0, 0, err
 	}
 	defer cancel()
 
 	req, err := rstub.PushData(context.Background())
 	if err != nil {
-		return count, err
+		return 0, 0, 0, 0, err
 	}
 
 	for {
 		data, err := SelectMetadataRange(mongodb.DB, offset, limit, date, lastID, timeout)
 		if err != nil {
-			return count, err
+			return 0, 0, 0, 0, err
 		}
 		for _, d := range data {
 			if d.Volume == 0 {
@@ -87,7 +93,7 @@ func PushMetadataToRepository(date string) (int64, error) {
 			})
 			if err != nil {
 				_, e1 := req.CloseAndRecv()
-				return count, fmt.Errorf("%v, nest error: %v", err, e1)
+				return 0, 0, 0, 0, fmt.Errorf("%v, nest error: %v", err, e1)
 			}
 			count++
 		}
@@ -101,8 +107,11 @@ func PushMetadataToRepository(date string) (int64, error) {
 		offset += limit
 	}
 
-	_, err = req.CloseAndRecv()
-	return count, err
+	resp, err := req.CloseAndRecv()
+	if err != nil {
+		return 0, 0, 0, 0, err
+	}
+	return count, resp.Stock, resp.Day, resp.Week, err
 }
 
 func FetchMetadataFromSina(today time.Time, delay bool) (string, int64, error) {
@@ -181,4 +190,23 @@ func FetchMetadataFromSina(today time.Time, delay bool) (string, int64, error) {
 		}
 	}
 	return date, count, nil
+}
+
+func CompleteTaskToRepository(date string, metadata, stock, day, week int64) error {
+	rstub, cancel, err := client_repository.NewClientForRepository()
+	if err != nil {
+		return err
+	}
+	defer cancel()
+
+	if _, err := rstub.Complete(context.Background(), &pb_repository.Task{
+		Date:          date,
+		MetadataCount: metadata,
+		StockCount:    stock,
+		DayCount:      day,
+		WeekCount:     week,
+	}); err != nil {
+		return err
+	}
+	return nil
 }

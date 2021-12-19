@@ -22,9 +22,15 @@ func TestOneCron(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	pushCount, err := PushMetadataToRepository(date)
+	date = "2021-12-17"
+	metadata, stock, day, week, err := PushMetadataToRepository(date)
 	if err != nil {
 		log.Fatal(err)
 	}
-	t.Logf("fetch: %d, push: %d\r\n", fetchCount, pushCount)
+
+	err = CompleteTaskToRepository(date, metadata, stock, day, week)
+	if err != nil {
+		log.Printf("complete failure, nest error: %v\r\n", err)
+	}
+	t.Logf("fetch: %d, push: %d, stock: %d, day: %d, week: %d\r\n", fetchCount, metadata, stock, day, week)
 }
