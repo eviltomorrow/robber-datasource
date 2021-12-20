@@ -38,11 +38,12 @@ var archiveCmd = &cobra.Command{
 
 		var total int64 = 0
 		for begin.Before(end) {
+			var start = time.Now()
 			count, stock, day, week, err := service.PushMetadataToRepository(begin.Format("2006-01-02"))
 			if err != nil {
 				log.Fatalf("[failure] date: %v, error: %v\r\n", begin.Format("2006-01-02"), err)
 			} else {
-				log.Printf("[success] date: %v, count: %v, stock: %v, day: %v, week: %v\r\n", begin.Format("2006-01-02"), count, stock, day, week)
+				log.Printf("[success] date: %v, count: %v, stock: %v, day: %v, week: %v, cost: %v\r\n", begin.Format("2006-01-02"), count, stock, day, week, time.Since(start))
 			}
 			begin = begin.AddDate(0, 0, 1)
 			total += count
