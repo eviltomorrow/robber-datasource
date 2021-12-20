@@ -20,5 +20,5 @@ COPY --from=builder /app/config/config-docker.toml /etc/robber-datasource/config
 
 VOLUME ["/var/log/robber-datasource"]
 
-EXPOSE 19090 2379 27017
+EXPOSE 27320 2379 27017
 ENTRYPOINT ["/bin/robber-datasource", "-c", "/etc/robber-datasource/config-docker.toml"]

@@ -15,7 +15,7 @@ endpoints = [
 
 [server]
 host = "0.0.0.0"
-port = 19090
+port = 27320
 
 [collect]
 code-list = [

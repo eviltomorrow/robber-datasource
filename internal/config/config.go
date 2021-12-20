@@ -73,7 +73,7 @@ var GlobalConfig = &Config{
 	},
 	Server: Server{
 		Host: "0.0.0.0",
-		Port: 19090,
+		Port: 27320,
 	},
 	Collect: Collect{
 		CodeList: []string{
