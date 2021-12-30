@@ -50,6 +50,7 @@ var rootCmd = &cobra.Command{
 
 		setupCfg()
 		setupVars()
+
 		if err := mongodb.Build(); err != nil {
 			zlog.Fatal("Build mongodb connection failure", zap.Error(err))
 		}
@@ -151,6 +152,7 @@ func setupCfg() {
 		log.Fatalf("[Fatal] Setup log config failure, nest error: %v\r\n", err)
 	}
 	zlog.ReplaceGlobals(global, prop)
+
 	zlog.Info("Global Config info", zap.String("cfg", cfg.String()))
 }
 
