@@ -21,6 +21,7 @@ func TestOneCron(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	_ = date
 
 	date = "2021-12-17"
 	metadata, stock, day, week, err := PushMetadataToRepository(date)
